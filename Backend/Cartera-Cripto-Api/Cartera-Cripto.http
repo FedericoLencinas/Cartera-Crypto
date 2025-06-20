@@ -1,0 +1,6 @@
+@Cartera_Cripto_HostAddress = http://localhost:5108
+
+GET {{Cartera_Cripto_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
