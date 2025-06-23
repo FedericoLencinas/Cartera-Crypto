@@ -1,23 +1,28 @@
 <template>
+  <!-- Barra de navegación para la sección de transacciones, siempre visible arriba -->
 <TransaccionNavBar></TransaccionNavBar>
 
+<!-- Contenedor principal de la tabla de historial de transacciones -->
 <div class="tableContainer">
+  <!-- Título del historial -->
   <H1>HISTORIAL DE TRANSACCIONES</H1>
 
+  <!-- Tabla que muestra la lista de transacciones -->
   <table class="min-w-full bg-white border border-gray-200 shadow-md rounded-md">
-
+  <!-- Encabezado de la tabla con los nombres de las columnas -->
   <tr class="bg-gray-100 text-center">
     <th class="py-3 px-5 border-b">ID</th>
     <th class="py-3 px-5 border-b">Action</th>
     <th class="py-3 px-5 border-b">Crypto code</th>
     <th class="py-3 px-5 border-b">Client id</th>
     <th class="py-3 px-5 border-b">Cantidad</th>
-    <th class="py-3 px-5 border-b">Dinero</th>
+    <th class="py-3 px-5 border-b">Monto</th>
     <th class="py-3 px-5 border-b">Fecha</th>
 
   </tr>
-
+  <!-- Cuerpo de la tabla: se llena dinámicamente con cada transacción -->
   <tbody>
+  <!-- Por cada transacción, se crea una fila con sus datos --> 
     <tr v-for="transaction in transactions"
             :key="transaction.id" class="hover:bg-gray-50">
             <td class="py-3 px-5 border-b"> {{ transaction.id }} </td>
@@ -39,16 +44,22 @@
 </template>
 
 <script setup>
+// Importa el componente de barra de navegación de transacciones
 import TransaccionNavBar from './TransaccionNavBar.vue';
+// Importa ref para variables reactivas, las variables reactivas son aquellas que se actualizan automáticamente en la vista cuando cambian
 import { ref } from 'vue';
 
+// Array reactivo para almacenar las transacciones obtenidas de la API
 const transactions = ref([]);
 
+// Función asíncrona para cargar los datos de la API
 async function cargarDatosApi() {
+  // Realiza la petición GET a la API de transacciones
   let respuesta = await fetch('https://localhost:7273/api/Transaccion');
+  // Convierte la respuesta a JSON y la asigna al array reactivo
   transactions.value = await respuesta.json();
 }
-
+// Llama a la función para cargar los datos automáticamente al iniciar el componente
 cargarDatosApi();
 
 </script>

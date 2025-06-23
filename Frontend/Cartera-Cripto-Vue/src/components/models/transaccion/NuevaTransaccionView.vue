@@ -1,10 +1,11 @@
 <script setup>
+// Importaciones necesarias de Vue, vee-validate y otras librerías
 import { ref, onMounted, watch } from 'vue'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import * as yup from 'yup'
 import TransaccionNavBar from './TransaccionNavBar.vue'
 
-// Esquema de validación
+// Esquema de validación usando Yup para los campos del formulario
 const schema = {
   action: yup.string().required('Debe seleccionar una acción'),
   crypto_code: yup.string().required('Debe seleccionar una criptomoneda'),
@@ -14,7 +15,7 @@ const schema = {
   datetime: yup.date().required(),
 }
 
-// Estado del formulario
+// Objeto reactivo para almacenar los datos de la nueva transacción
 const newTransaction = ref({
   action: '',
   crypto_code: '',
@@ -24,14 +25,16 @@ const newTransaction = ref({
   datetime: ''
 })
 
-// Clientes
+
+// Array reactivo para la lista de clientes
 const clients = ref([])
+// Función para traer los clientes desde la API
 async function traerClientes() {
   let clientApiData = await fetch('https://localhost:7273/api/Cliente')
   clients.value = await clientApiData.json()
 }
 
-// Fecha y hora actual
+// Variables y funciones para manejar la fecha y hora actual
 const fechaHora = ref('')
 function getFechaHoraActual() {
   const x = new Date()
@@ -46,15 +49,17 @@ function actualizarFechaHora() {
   fechaHora.value = getFechaHoraActual()
   newTransaction.value.datetime = new Date().toISOString()
 }
+// Al montar el componente, carga los clientes y la hora actual, y actualiza la hora cada minuto
 onMounted(() => {
   traerClientes()
   actualizarFechaHora()
   setInterval(actualizarFechaHora, 60000)
 })
 
-// Precio cripto
+// Variables reactivas para el valor del dinero y datos de cripto
 const money = ref(0)
 const crypto = ref('')
+// Función para obtener el precio de la criptomoneda según código y cantidad
 async function llamarCryptoApi(codigo, cantidad) {
   try {
     const url = `https://criptoya.com/api/${codigo}/ars/${cantidad}`
@@ -62,6 +67,7 @@ async function llamarCryptoApi(codigo, cantidad) {
     const data = await response.json()
     crypto.value = data
     money.value = data.ripio?.ask ?? 0
+    // Calcula el total en dinero por la cantidad ingresada
     newTransaction.value.money = money.value * (newTransaction.value.crypto_amount || 0)
   } catch (error) {
     console.error('Error llamando a la API de cripto:', error)
@@ -69,6 +75,7 @@ async function llamarCryptoApi(codigo, cantidad) {
     newTransaction.value.money = 0
   }
 }
+// Observa los cambios en el tipo y cantidad de cripto para actualizar el valor automáticamente
 watch(
   () => [newTransaction.value.crypto_code, newTransaction.value.crypto_amount],
   ([codigo, cantidad]) => {
@@ -81,21 +88,22 @@ watch(
   }
 )
 
-// Enviar datos
+// Función para enviar los datos de la transacción a la API
 async function enviarDatosApi() {
-  // Fuerza ClienteId a número
+  // Convierte ClienteId y money a número por si acaso
   newTransaction.value.ClienteId = Number(newTransaction.value.ClienteId)
-  // Calcula money actualizado
+  
   newTransaction.value.money = Number(money.value) * Number(newTransaction.value.crypto_amount || 0)
-  // Actualiza datetime
+  
   newTransaction.value.datetime = new Date().toISOString()
 
-  // Borra client_id si existe por error viejo
+  // Borra campo que no debe enviarse si existe
   delete newTransaction.value.client_id
 
-  // Mostrá el JSON que se va a enviar
+  // Muestra los datos que se van a enviar (debug)
   console.log(JSON.stringify(newTransaction.value, null, 2))
 
+  // Hace el POST a la API
   let response = await fetch('https://localhost:7273/api/Transaccion', {
     method: 'POST',
     body: JSON.stringify(newTransaction.value),
@@ -105,6 +113,7 @@ async function enviarDatosApi() {
     }
   })
 
+  // Muestra alertas según el resultado
   if (response.ok) {
     alert('Transacción agregada exitosamente')
   } else {
@@ -175,7 +184,7 @@ async function enviarDatosApi() {
         <ErrorMessage name="crypto_amount" class="error-message" />
         <br /><br />
 
-        <!-- Campos ocultos -->
+        
         <Field type="hidden" name="money" v-model="newTransaction.money" />
         <Field type="hidden" name="datetime" v-model="newTransaction.datetime" />
 

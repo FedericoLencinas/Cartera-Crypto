@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "tgi3PRWPMwM=",
+  "dgSpecHash": "apboTtgb/MY=",
   "success": true,
-  "projectFilePath": "C:\\Users\\flenc\\OneDrive\\Desktop\\TrabajofinalProgramación\\Trabajo-Final-Programacion\\Backend\\Cartera-Cripto-Api\\Cartera-Cripto.csproj",
+  "projectFilePath": "C:\\Users\\flenc\\OneDrive\\Desktop\\TrabajoFinalProgramacion\\Backend\\Cartera-Cripto-Api\\Cartera-Cripto.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\flenc\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\flenc\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

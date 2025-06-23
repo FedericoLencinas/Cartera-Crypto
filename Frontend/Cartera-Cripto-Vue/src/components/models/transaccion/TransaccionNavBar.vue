@@ -1,21 +1,30 @@
 <template>
+  <!-- Barra de navegación principal para Transacciones -->
   <div class="navBar">
     <ul>
+      <!-- Menú desplegable para las opciones de transacciones -->
       <li class="dropdown">
+        <!-- Título del menú desplegable -->
         <span class="dropbtn">Transacciones ▼</span>
+        <!-- Opciones dentro del menú desplegable -->
         <div class="dropdown-content">
+          <!-- Opción para crear una nueva transacción -->
           <RouterLink to="/transacciones/new" class="no-subrayado">Nueva Transacción</RouterLink>
+          <!-- Opción para ver el historial de transacciones -->
           <RouterLink to="/transacciones/list" class="no-subrayado">Historial de Transacciones</RouterLink>
         </div>
       </li>
     </ul>
   </div>
+  <!-- Aquí se renderiza el componente correspondiente a la ruta seleccionada -->
   <div>
     <RouterView></RouterView>
   </div>
 </template>
 
 <script setup>
+// Importa los componentes RouterLink y RouterView de vue-router para la navegación
+// RouterLink permite crear enlaces a diferentes rutas, mientras que RouterView renderiza el componente correspondiente
 import { RouterLink, RouterView } from 'vue-router'
 </script>
 

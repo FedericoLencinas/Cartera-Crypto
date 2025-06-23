@@ -1,9 +1,12 @@
 <template>
+  <!-- Componente de barra de navegación de clientes, siempre visible arriba -->
   <ClienteNavBar></ClienteNavBar>
 
-   <div class="tableContainer max-w-5xl mx-auto mt-10 px-4">
+  <!-- Contenedor de la tabla de clientes, con estilos de centrado y márgenes -->
+  <div class="tableContainer max-w-5xl mx-auto mt-10 px-4">
     <h1>Lista de Clientes</h1>
 
+    <!-- Permite scroll horizontal si la tabla es muy ancha -->
     <div class="overflow-x-auto">
       <table class="min-w-full bg-white border border-gray-200 shadow-md rounded-md overflow-hidden">
         <thead class="bg-gray-100 text-gray-700">
@@ -15,7 +18,9 @@
           </tr>
         </thead>
 
+        <!-- El cuerpo de la tabla se llena dinámicamente con los datos de clients -->
         <tbody>
+          <!-- Por cada cliente en el array clients, se crea una fila de la tabla -->
           <tr v-for="client in clients" :key="client.id" class="hover:bg-gray-50">
             <td class="py-3 px-4 border-t">{{ client.id }}</td>
             <td class="py-3 px-4 border-t">{{ client.name }}</td>
@@ -30,14 +35,22 @@
 </template>
 
 <script setup>
+// Importa el componente de barra de navegación de clientes
 import ClienteNavBar from './ClienteNavBar.vue';
+// Importa la función ref de Vue para variables reactivas
 import { ref } from 'vue';
 
+// Define un array reactivo para almacenar los clientes
 const clients = ref([]);
+
+// Función asíncrona para cargar los datos desde la API
 async function cargarDatosApi() {
+  // Realiza una petición GET a la API de clientes
   let respuesta = await fetch('https://localhost:7273/api/Cliente');
+  // Convierte la respuesta a JSON y la asigna al array clients
   clients.value = await respuesta.json();
 }
+// Llama a la función para cargar los datos al iniciar el componente
 cargarDatosApi();
 </script>
 

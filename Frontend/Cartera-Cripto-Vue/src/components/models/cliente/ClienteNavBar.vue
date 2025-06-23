@@ -1,23 +1,30 @@
 <template>
+  <!-- Barra de navegación principal -->
   <div class="navBar">
     <ul>
+      <!-- Elemento de menú desplegable para "Clientes" -->
       <li class="dropdown">
+        <!-- Botón del menú desplegable -->
         <span class="dropbtn">Clientes ▼</span>
+        <!-- Contenido del menú desplegable -->
         <div class="dropdown-content">
+          <!-- Opción para crear un nuevo cliente, navega a /clientes/new -->
           <RouterLink to="/clientes/new" class="no-subrayado">Nuevo Cliente</RouterLink>
+          <!-- Opción para ver la lista de clientes, navega a /clientes/list -->
           <RouterLink to="/clientes/list" class="no-subrayado">Lista Clientes</RouterLink>
         </div>
       </li>
     </ul>
   </div>
+  <!-- Aquí se renderiza el componente según la ruta seleccionada -->
   <div>
     <RouterView></RouterView>
   </div>
 </template>
 
 <script setup>
-import { RouterLink} from 'vue-router'
-
+  // Importa el componente RouterLink de vue-router para navegación entre páginas
+  import { RouterLink } from 'vue-router'
 </script>
 
 <style>

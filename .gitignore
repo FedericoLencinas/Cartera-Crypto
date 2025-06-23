@@ -26,16 +26,7 @@ coverage
 *.njsproj
 *.sln
 *.sw?
-
 *.tsbuildinfo
 
-# Visual Studio
+# Visual Studio user-specific files
 .vs/
-*.db-shm
-*.db-wal
-*.vsidx
-*.user
-
-# .NET build output
-bin/
-obj/

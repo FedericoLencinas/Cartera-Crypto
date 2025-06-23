@@ -1,12 +1,16 @@
 <template>
-    <div class="navBar">
+  <!-- Contenedor principal de la barra de navegación -->
+  <div class="navBar">
     <ul>
+      <!-- Enlace al menú principal (Home) -->
       <li>
         <RouterLink to="/" class="no-subrayado">Menu</RouterLink>
       </li>
+      <!-- Enlace a la sección de clientes -->
       <li>
         <RouterLink to="/clientes" class="no-subrayado">Clientes</RouterLink>
       </li>
+      <!-- Enlace a la sección de transacciones -->
       <li>
         <RouterLink to="/transacciones" class="no-subrayado">Transacciones</RouterLink>
       </li>
@@ -19,7 +23,8 @@
 </template>
 
 <script setup>
-        import { RouterLink} from 'vue-router'
+// Importa RouterLink para la navegación interna de Vue Router
+import { RouterLink } from 'vue-router'
 </script>
 
 <style scoped>
