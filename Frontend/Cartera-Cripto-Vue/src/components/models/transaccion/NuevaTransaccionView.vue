@@ -25,7 +25,6 @@ const newTransaction = ref({
   datetime: ''
 })
 
-
 // Array reactivo para la lista de clientes
 const clients = ref([])
 // Función para traer los clientes desde la API
@@ -49,7 +48,6 @@ function actualizarFechaHora() {
   fechaHora.value = getFechaHoraActual()
   newTransaction.value.datetime = new Date().toISOString()
 }
-// Al montar el componente, carga los clientes y la hora actual, y actualiza la hora cada minuto
 onMounted(() => {
   traerClientes()
   actualizarFechaHora()
@@ -59,7 +57,6 @@ onMounted(() => {
 // Variables reactivas para el valor del dinero y datos de cripto
 const money = ref(0)
 const crypto = ref('')
-// Función para obtener el precio de la criptomoneda según código y cantidad
 async function llamarCryptoApi(codigo, cantidad) {
   try {
     const url = `https://criptoya.com/api/${codigo}/ars/${cantidad}`
@@ -67,15 +64,13 @@ async function llamarCryptoApi(codigo, cantidad) {
     const data = await response.json()
     crypto.value = data
     money.value = data.ripio?.ask ?? 0
-    // Calcula el total en dinero por la cantidad ingresada
     newTransaction.value.money = money.value * (newTransaction.value.crypto_amount || 0)
   } catch (error) {
-    console.error('Error llamando a la API de cripto:', error)
+    console.error('Error llamando a la API de criptos:', error)
     money.value = 0
     newTransaction.value.money = 0
   }
 }
-// Observa los cambios en el tipo y cantidad de cripto para actualizar el valor automáticamente
 watch(
   () => [newTransaction.value.crypto_code, newTransaction.value.crypto_amount],
   ([codigo, cantidad]) => {
@@ -88,22 +83,58 @@ watch(
   }
 )
 
+// 💡 Saldo disponible del cliente para la cripto seleccionada
+const saldoDisponible = ref(null)
+
+// 🔍 Función para obtener el saldo disponible
+async function obtenerSaldoDisponible(clienteId, cryptoCode) {
+  if (!clienteId || !cryptoCode) {
+    saldoDisponible.value = null
+    return
+  }
+  try {
+    const response = await fetch(`https://localhost:7273/api/Transaccion`)
+    const transacciones = await response.json()
+
+    const transaccionesFiltradas = transacciones.filter(
+      t => t.ClienteId === clienteId && t.crypto_code.toLowerCase() === cryptoCode.toLowerCase()
+    )
+
+    let saldo = 0
+    for (const t of transaccionesFiltradas) {
+      if (t.action.toLowerCase() === 'purchase') saldo += t.crypto_amount
+      else if (t.action.toLowerCase() === 'sale') saldo -= t.crypto_amount
+    }
+
+    saldoDisponible.value = saldo
+  } catch (error) {
+    console.error('Error al obtener saldo disponible:', error)
+    saldoDisponible.value = null
+  }
+}
+
+// 👀 Observa cambios en cliente y cripto para actualizar el saldo
+watch(
+  () => [newTransaction.value.ClienteId, newTransaction.value.crypto_code],
+  ([clienteId, cryptoCode]) => {
+    if (clienteId && cryptoCode) {
+      obtenerSaldoDisponible(Number(clienteId), cryptoCode)
+    } else {
+      saldoDisponible.value = null
+    }
+  }
+)
+
 // Función para enviar los datos de la transacción a la API
 async function enviarDatosApi() {
-  // Convierte ClienteId y money a número por si acaso
   newTransaction.value.ClienteId = Number(newTransaction.value.ClienteId)
-  
   newTransaction.value.money = Number(money.value) * Number(newTransaction.value.crypto_amount || 0)
-  
   newTransaction.value.datetime = new Date().toISOString()
 
-  // Borra campo que no debe enviarse si existe
   delete newTransaction.value.client_id
 
-  // Muestra los datos que se van a enviar (debug)
   console.log(JSON.stringify(newTransaction.value, null, 2))
 
-  // Hace el POST a la API
   let response = await fetch('https://localhost:7273/api/Transaccion', {
     method: 'POST',
     body: JSON.stringify(newTransaction.value),
@@ -113,7 +144,6 @@ async function enviarDatosApi() {
     }
   })
 
-  // Muestra alertas según el resultado
   if (response.ok) {
     alert('Transacción agregada exitosamente')
   } else {
@@ -139,7 +169,7 @@ async function enviarDatosApi() {
           <Field as="select" name="action" v-model="newTransaction.action" class="input-field">
             <option disabled value="">Elija una acción</option>
             <option value="purchase">purchase</option>
-            <option value="sell">sale</option>
+            <option value="sale">sale</option>
           </Field>
         </label>
         <ErrorMessage name="action" class="error-message" />
@@ -171,6 +201,12 @@ async function enviarDatosApi() {
         <ErrorMessage name="ClienteId" class="error-message" />
         <br />
 
+        <!-- Mostramos el saldo disponible -->
+        <div v-if="saldoDisponible !== null">
+          <strong>Saldo disponible: {{ saldoDisponible }}</strong>
+        </div>
+        <br />
+
         <label>
           Monto:
           <Field
@@ -184,7 +220,6 @@ async function enviarDatosApi() {
         <ErrorMessage name="crypto_amount" class="error-message" />
         <br /><br />
 
-        
         <Field type="hidden" name="money" v-model="newTransaction.money" />
         <Field type="hidden" name="datetime" v-model="newTransaction.datetime" />
 
@@ -196,6 +231,7 @@ async function enviarDatosApi() {
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .form-container {
