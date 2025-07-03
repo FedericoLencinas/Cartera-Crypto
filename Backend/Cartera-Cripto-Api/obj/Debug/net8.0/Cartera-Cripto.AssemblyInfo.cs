@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Cartera-Cripto")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+be614ef6e6ece457cdb77e1e5f6ea34286acc86b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a6d44c5b7c578d1142cef3b92b591af460c4b929")]
 [assembly: System.Reflection.AssemblyProductAttribute("Cartera-Cripto")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Cartera-Cripto")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

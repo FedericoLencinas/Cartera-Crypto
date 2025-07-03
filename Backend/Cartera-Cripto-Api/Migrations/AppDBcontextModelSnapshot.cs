@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
-
 namespace Cartera_Cripto.Migrations
 {
     [DbContext(typeof(AppDBcontext))]

@@ -1,4 +1,5 @@
 namespace Cartera_Cripto
+
 {
     public class WeatherForecast
     {

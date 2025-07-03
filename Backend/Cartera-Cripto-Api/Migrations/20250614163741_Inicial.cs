@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
-
 namespace Cartera_Cripto.Migrations
 {
     /// <inheritdoc />
