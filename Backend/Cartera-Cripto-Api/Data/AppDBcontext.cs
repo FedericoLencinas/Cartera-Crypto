@@ -3,6 +3,7 @@
 namespace Cartera_Cripto.Data
 {
     // 2 Una vez instalados los paquetes hacemos la clase que herede de DbContext
+
     public class AppDBcontext : DbContext
     {
         // 3 En esta parte definimos el constructor de la clase

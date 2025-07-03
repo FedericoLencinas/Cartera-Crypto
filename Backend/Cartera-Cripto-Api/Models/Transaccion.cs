@@ -25,7 +25,6 @@ namespace Cartera_Cripto.Models
         public float crypto_amount { get; set; }
 
         [NotNull,Required]
-        
         public float money { get; set; }
         public DateTime datetime { get; set; }
     }

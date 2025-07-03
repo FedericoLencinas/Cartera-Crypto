@@ -45,6 +45,7 @@ namespace Cartera_Cripto.Controllers
         public async Task<ActionResult<IEnumerable<Cliente>>> Get()
         {
             var clientes = await _context.Clientes.ToListAsync();
+
             // Oculta la contraseña de todos los clientes
             clientes.ForEach(c => c.password = null);
             return clientes;
@@ -104,20 +105,21 @@ namespace Cartera_Cripto.Controllers
             }
         }
 
-        [HttpPost("login")]
-        [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] Cliente loginCliente)
-        {
-            var cliente = await _context.Clientes
-                .FirstOrDefaultAsync(c => c.email == loginCliente.email && c.password == loginCliente.password);
+        
+        //[HttpPost("login")]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> Login([FromBody] Cliente loginCliente)
+        //{
+        //    var cliente = await _context.Clientes
+        //        .FirstOrDefaultAsync(c => c.email == loginCliente.email && c.password == loginCliente.password);
 
-            if (cliente == null)
-                return Unauthorized(new { message = "Email o contraseña incorrectos" });
+        //    if (cliente == null)
+        //        return Unauthorized(new { message = "Email o contraseña incorrectos" });
 
-            // ¡No devuelvas la contraseña!
-            cliente.password = null;
-            return Ok(cliente);
-        }
+        //    // ¡No devuelvas la contraseña!
+        //    cliente.password = null;
+        //    return Ok(cliente);
+        //}
 
         //// Método HTTP PATCH para actualizar parcialmente un cliente
 

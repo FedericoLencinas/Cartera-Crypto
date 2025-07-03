@@ -6,6 +6,7 @@ namespace Cartera_Cripto.Models
     public class Cliente
     {
         //Primero creo los modelos
+
         [Key]
         public int id { get; set; }
         [NotNull]

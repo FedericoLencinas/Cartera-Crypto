@@ -28,6 +28,7 @@ namespace Cartera_Cripto.Validaciones
             // Uso el método IsMatch para verificar si el email cumple
             // con la expresión regular.
             // En caso de que sí, retorna true, de lo contrario false.
+
             return regex.IsMatch(email);
 
         }
