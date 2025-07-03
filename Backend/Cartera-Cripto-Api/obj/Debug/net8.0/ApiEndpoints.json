@@ -47,37 +47,6 @@
   },
   {
     "ContainingType": "Cartera_Cripto.Controllers.ClienteController",
-    "Method": "Patch",
-    "RelativePath": "api/Cliente/{id}",
-    "HttpMethod": "PATCH",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      },
-      {
-        "Name": "cliente",
-        "Type": "Cartera_Cripto.Models.Cliente",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "Cartera_Cripto.Models.Cliente",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "Cartera_Cripto.Controllers.ClienteController",
     "Method": "Login",
     "RelativePath": "api/Cliente/login",
     "HttpMethod": "POST",
@@ -169,53 +138,6 @@
         "StatusCode": 200
       }
     ]
-  },
-  {
-    "ContainingType": "Cartera_Cripto.Controllers.TransaccionController",
-    "Method": "Patch",
-    "RelativePath": "api/Transaccion/{id}",
-    "HttpMethod": "PATCH",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      },
-      {
-        "Name": "transaction",
-        "Type": "Cartera_Cripto.Models.Transaccion",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "Cartera_Cripto.Models.Transaccion",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "Cartera_Cripto.Controllers.TransaccionController",
-    "Method": "Delete",
-    "RelativePath": "api/Transaccion/{id}",
-    "HttpMethod": "DELETE",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
   },
   {
     "ContainingType": "Cartera_Cripto.Controllers.WeatherForecastController",

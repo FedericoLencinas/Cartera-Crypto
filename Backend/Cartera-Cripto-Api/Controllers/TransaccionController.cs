@@ -49,7 +49,8 @@ namespace Cartera_Cripto.Controllers
         {
             var transacciones = await _context.Transacciones
                 .Include(t => t.Cliente)
-                .Select(t => new {
+                .Select(t => new
+                {
                     t.id,
                     t.action,
                     t.crypto_code,
@@ -63,7 +64,7 @@ namespace Cartera_Cripto.Controllers
 
             return Ok(transacciones);
         }
-        
+
 
         // Método HTTP GET para obtener una transacción específica por id
 
@@ -88,15 +89,52 @@ namespace Cartera_Cripto.Controllers
             return transaccion;
         }
 
-        // Método HTTP POST para crear una nueva transacción    
+        // Método HTTP POST para crear una nueva transacción  
         [HttpPost]
         public async Task<IActionResult> Post(Transaccion transaccion)
         {
-            // Verificá que cliente existe
+            // Verificar que el cliente existe
             var cliente = await _context.Clientes.FindAsync(transaccion.ClienteId);
             if (cliente == null)
             {
                 return BadRequest("Cliente no existe.");
+            }
+
+            // Validar que la acción sea válida
+            if (transaccion.action.ToLower() != "purchase" && transaccion.action.ToLower() != "sale")
+            {
+                return BadRequest("La acción debe ser 'purchase' o 'sale'.");
+            }
+
+            // Obtener el precio actual de la criptomoneda en ARS
+            decimal precioActual;
+            try
+            {
+                precioActual = await ObtenerPrecioActualARS(transaccion.crypto_code);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error al obtener el precio de la criptomoneda: {ex.Message}");
+            }
+
+            // Calcular el monto de dinero basado en el precio actual
+            transaccion.money = (float)((decimal)transaccion.crypto_amount * precioActual);
+
+            // Validar si la transacción es una venta y el saldo es suficiente
+            if (transaccion.action.ToLower() == "sale")
+            {
+                var transacciones = await _context.Transacciones
+                    .Where(t => t.ClienteId == transaccion.ClienteId && t.crypto_code.ToLower() == transaccion.crypto_code.ToLower())
+                    .ToListAsync();
+
+                float saldoDisponible = transacciones.Sum(t =>
+                    t.action.ToLower() == "purchase" ? t.crypto_amount : -t.crypto_amount);
+
+                // Validar cantidad de criptomonedas disponibles
+                if (transaccion.action == "sale" && transaccion.crypto_amount > saldoDisponible)
+                {
+                    return BadRequest($"No tenés suficiente cantidad de {transaccion.crypto_code} disponible. Saldo actual: {saldoDisponible}");
+                }
             }
 
             // Asignar la referencia para que EF entienda la relación
@@ -106,7 +144,6 @@ namespace Cartera_Cripto.Controllers
             _context.Transacciones.Add(transaccion);
             await _context.SaveChangesAsync();
 
-            // Para devolver la transacción con datos del cliente cargados
             var transaccionConCliente = await _context.Transacciones
                 .Include(t => t.Cliente)
                 .FirstOrDefaultAsync(t => t.id == transaccion.id);
@@ -114,90 +151,84 @@ namespace Cartera_Cripto.Controllers
             return Ok(transaccionConCliente);
         }
 
-        // Método HTTP PATCH para actualizar una transacción existente por id
-
-        [HttpPatch("{id}")]
-        public async Task<ActionResult<Transaccion>> Patch(int id, Transaccion transaction)
+        // Método para obtener el precio actual de una criptomoneda en ARS
+        private async Task<decimal> ObtenerPrecioActualARS(string cryptoCode)
         {
-            // Compara el id de la transacción proporcionada con el id del parámetro
-            // si no coinciden, devuelve un BadRequest con un mensaje de error.
-            if (id != transaction.id)
+            using (var httpClient = new HttpClient())
             {
-                return BadRequest("El ID de la transacción no coincide con el ID proporcionado.");
-            }
+                string url = $"https://criptoya.com/api/{cryptoCode.ToLower()}/ars";
+                var response = await httpClient.GetAsync(url);
 
-            // Marca la transacción como modificada en el contexto de la base de datos.
-
-            _context.Entry(transaction).State = EntityState.Modified;
-
-            // Intenta guardar los cambios en la base de datos de forma asíncrona.
-            await _context.SaveChangesAsync();
-
-            // Retorna NoContent (204) si la actualización fue exitosa.
-            return NoContent();
-        }
-
-        // DELETE api/<TransaccionController>/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
-        {
-            // Busca la transacción por id en la base de datos.
-            var transaccion = await _context.Transacciones.FindAsync(id);
-
-            if (transaccion == null)
-            {
-                // Si no se encuentra la transacción, devuelve un NotFound (404).
-                return NotFound();
-            }
-
-            // Si se encuentra, elimina la transacción del
-            // contexto de la base de datos.
-            _context.Transacciones.Remove(transaccion);
-
-            // Guarda los cambios en la base de datos de forma asíncrona.
-            await _context.SaveChangesAsync();
-
-            // Retorna NoContent (204) si la eliminación fue exitosa.
-            return NoContent();
-        }
-
-        // Método HTTP GET para obtener el estado actual de las criptomonedas
-
-        [HttpGet("estado")]
-
-        // Función para obtener el precio actual en ARS de una cripto usando la API de CriptoYa
-        private async Task<decimal> ObtenerPrecioActualARS(HttpClient httpClient, string cryptoCode)
-        {
-            // Construyo la URL para consultar el precio de la cripto (en minúsculas)
-            string url = $"https://criptoya.com/api/{cryptoCode.ToLower()}/ars";
-
-            // Hago la petición GET a la API
-            var response = await httpClient.GetAsync(url);
-
-            // Si la respuesta no fue exitosa, devuelvo 0 como precio (podés mejorar manejo)
-            if (!response.IsSuccessStatusCode)
-            {
-                return 0;
-            }
-
-            // Leo el contenido JSON de la respuesta como string
-            var jsonString = await response.Content.ReadAsStringAsync();
-
-            // Parseo el JSON para poder extraer campos
-            using var jsonDoc = JsonDocument.Parse(jsonString);
-
-            // Busco la propiedad "price" dentro del JSON
-            if (jsonDoc.RootElement.TryGetProperty("price", out JsonElement priceElement))
-            {
-                // Intento convertir "price" a decimal
-                if (priceElement.TryGetDecimal(out decimal price))
+                if (!response.IsSuccessStatusCode)
                 {
-                    return price;
+                    throw new Exception("No se pudo obtener el precio actual de la criptomoneda.");
                 }
+
+                var jsonString = await response.Content.ReadAsStringAsync();
+                using var jsonDoc = JsonDocument.Parse(jsonString);
+
+                // Buscar específicamente el valor de "ask" en la plataforma "satoshitango"
+                if (jsonDoc.RootElement.TryGetProperty("satoshitango", out JsonElement satoshitangoElement) &&
+                    satoshitangoElement.TryGetProperty("ask", out JsonElement askElement) &&
+                    askElement.TryGetDecimal(out decimal precioActual))
+                {
+                    return precioActual;
+                }
+
+                throw new Exception("No se pudo obtener el precio de la criptomoneda en satoshitango.");
             }
 
-            // Si no encontré el precio, devuelvo 0
-            return 0;
+
+
+
+            //// Método HTTP PATCH para actualizar una transacción existente por id
+
+            //[HttpPatch("{id}")]
+            //public async Task<ActionResult<Transaccion>> Patch(int id, Transaccion transaction)
+            //{
+            //    // Compara el id de la transacción proporcionada con el id del parámetro
+            //    // si no coinciden, devuelve un BadRequest con un mensaje de error.
+            //    if (id != transaction.id)
+            //    {
+            //        return BadRequest("El ID de la transacción no coincide con el ID proporcionado.");
+            //    }
+
+            //    // Marca la transacción como modificada en el contexto de la base de datos.
+
+            //    _context.Entry(transaction).State = EntityState.Modified;
+
+            //    // Intenta guardar los cambios en la base de datos de forma asíncrona.
+            //    await _context.SaveChangesAsync();
+
+            //    // Retorna NoContent (204) si la actualización fue exitosa.
+            //    return NoContent();
+            //}
+
+            //// DELETE api/<TransaccionController>/5
+            //[HttpDelete("{id}")]
+            //public async Task<ActionResult> Delete(int id)
+            //{
+            //    // Busca la transacción por id en la base de datos.
+            //    var transaccion = await _context.Transacciones.FindAsync(id);
+
+            //    if (transaccion == null)
+            //    {
+            //        // Si no se encuentra la transacción, devuelve un NotFound (404).
+            //        return NotFound();
+            //    }
+
+            //    // Si se encuentra, elimina la transacción del
+            //    // contexto de la base de datos.
+            //    _context.Transacciones.Remove(transaccion);
+
+            //    // Guarda los cambios en la base de datos de forma asíncrona.
+            //    await _context.SaveChangesAsync();
+
+            //    // Retorna NoContent (204) si la eliminación fue exitosa.
+            //    return NoContent();
+            //}
+
+
         }
     }
 }

@@ -119,26 +119,26 @@ namespace Cartera_Cripto.Controllers
             return Ok(cliente);
         }
 
-        // Método HTTP PATCH para actualizar parcialmente un cliente
+        //// Método HTTP PATCH para actualizar parcialmente un cliente
 
-        [HttpPatch("{id}")]
-        public async Task<ActionResult<Cliente>> Patch(int id, Cliente cliente)
-        {
-            if (id != cliente.id)
-            {
-                // Si el id del cliente no coincide con el id de la URL, devuelve un BadRequest (400)
-                return BadRequest("El ID del cliente no coincide.");
-            }
+        //[HttpPatch("{id}")]
+        //public async Task<ActionResult<Cliente>> Patch(int id, Cliente cliente)
+        //{
+        //    if (id != cliente.id)
+        //    {
+        //        // Si el id del cliente no coincide con el id de la URL, devuelve un BadRequest (400)
+        //        return BadRequest("El ID del cliente no coincide.");
+        //    }
 
-            // Marca el estado del cliente como modificado
-            _context.Entry(cliente).State = EntityState.Modified;
+        //    // Marca el estado del cliente como modificado
+        //    _context.Entry(cliente).State = EntityState.Modified;
 
-            // Intenta guardar los cambios en la base de datos  
-            await _context.SaveChangesAsync();
+        //    // Intenta guardar los cambios en la base de datos  
+        //    await _context.SaveChangesAsync();
 
-            // Retorna NoContent (204) si la actualización fue exitosa
-            return NoContent();
-        }
+        //    // Retorna NoContent (204) si la actualización fue exitosa
+        //    return NoContent();
+        //}
     }
 }
 

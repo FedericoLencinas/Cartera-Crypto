@@ -10,6 +10,7 @@ namespace Cartera_Cripto.Models
         [Key]
         public int id { get; set; }
         [NotNull, Required]
+        [RegularExpression("purchase|sale", ErrorMessage = "La acción debe ser 'purchase' o 'sale'.")]
         public string action { get; set; }
         [NotNull, Required]
         public string crypto_code { get; set; }
@@ -18,11 +19,14 @@ namespace Cartera_Cripto.Models
         
         [JsonIgnore]  // Esto hace que no aparezca cliente en JSON
         public Cliente? Cliente { get; set; }
-        [NotNull]
+
+        [NotNull,Required]
+        [Range(0.01, double.MaxValue, ErrorMessage = "La cantidad de criptomonedas debe ser mayor a 0.")]
         public float crypto_amount { get; set; }
-        [NotNull]
+
+        [NotNull,Required]
+        
         public float money { get; set; }
-        [NotNull, Required]
         public DateTime datetime { get; set; }
     }
 }
